@@ -3,14 +3,15 @@ import express from 'express';
 import { products } from './routes/products';
 
 const app = express();
+const port = 80;
+
 app.use(bodyParser.json());
 
 app.get('/', (req, res) => {
+    console.log(`Request Recieved`);
     res.send('Hello World!');
 });
 
-app.use('/api/products', products);
-
-app.listen(5000, () => {
-    console.log(`Server listening on port 5000`);
+app.listen(port, () => {
+    console.log(`Server listening on port ${port}`);
 });
