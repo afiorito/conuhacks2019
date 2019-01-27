@@ -1,6 +1,8 @@
+import axios from 'axios';
 import express from 'express';
 import multer from 'multer';
 import { Product } from '../db/models/Product';
+import {walmartKey} from '../../Keys/key';
 
 export const products = express.Router();
 
@@ -12,6 +14,23 @@ products.get('/', async (req, res) => {
 
 products.get('/interesting', async (req, res) => {
     res.json(await Product.aggregate([{ $sample: { size: 10 } }]));
+});
+
+products.post('/search/text', async (req, res) => {
+    const results = await axios.get(`http://api.walmartlabs.com/v1/search?apiKey=${walmartKey}&query=${req.body.queryString}`);
+
+    const keywords = results.data.items.reduce((acc: [string], p: any) => {
+        return acc.concat(p.categoryPath.split(' '));
+    }, []);
+
+    let category = null;
+    const products = await Product.find({ attributes: {$in: keywords.map((k: string) => k.toLowerCase())} });
+
+    if (products.length > 0 ) {
+        category = (products[0] as any).category;
+    }
+
+    res.json({ category, products });
 });
 
 products.post('/search/image', upload.array('file'), async (req, res) => {

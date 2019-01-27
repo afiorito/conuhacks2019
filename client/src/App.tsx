@@ -6,6 +6,7 @@ import camera from './camera.svg';
 import { GBNavbar } from './GBNavbar';
 import { InterestingProducts } from './InterestingProducts';
 import { RelevantProducts } from './RelevantProducts';
+import {debounce} from 'throttle-debounce';
 
 interface IAppState {
   category: string | null;
@@ -18,6 +19,8 @@ class App extends Component<{}, IAppState> {
 
   constructor(props: object) {
     super(props);
+
+    this.makeCall = debounce(500, this.makeCall);
 
     this.state = {
       isLoading: false,
@@ -57,6 +60,37 @@ class App extends Component<{}, IAppState> {
 
   }
 
+  public makeCall = async (queryString: string) => {
+    if (queryString == '') {
+      this.setState({
+        isLoading: false,
+        products: null,
+        category: null,
+      });
+      return;
+    }
+    try {
+      const response = await fetch('/api/products/search/text', {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({queryString}) as any,
+        method: 'POST',
+      });
+      const data = await response.json();
+      console.log(response, data, this);
+
+      this.setState({ category: data.category, products: data.products, isLoading: false });
+    } catch {
+      this.setState({ products: [], isLoading: false });
+    }
+  }
+
+  public handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    this.makeCall(e.target.value);
+  }
+
   public render() {
     const { isLoading, products, category } = this.state;
     return (
@@ -64,7 +98,7 @@ class App extends Component<{}, IAppState> {
         <GBNavbar/>
         <Container>
           <div className="input-container">
-            <Input placeholder="Search for a sustainable alternative..." />
+            <Input onChange={this.handleSearch} placeholder="Search for a sustainable alternative..." />
             <div onClick={this.accessCamera} className="camera-input">
               <input onChange={this.handleImageUpload} ref={this.photoInput} type="file" accept="image/*" capture="camera" />
               <img src={camera} />
