@@ -1,12 +1,7 @@
 import React from 'react';
 import {
-  Collapse,
-  Nav,
   Navbar,
-  NavbarBrand,
-  NavbarToggler,
-  NavItem,
-  NavLink } from 'reactstrap';
+  NavbarBrand } from 'reactstrap';
 import './GBNavbar.scss';
 
 interface IGBNavbarState {

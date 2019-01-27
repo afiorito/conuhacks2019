@@ -1,0 +1,12 @@
+.InterestingProducts {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin-top: 20px;
+
+    .card {
+        width: 25%;
+        margin-bottom: 20px;
+        margin: 0px 20px;
+    }
+}

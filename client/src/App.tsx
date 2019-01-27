@@ -3,6 +3,7 @@ import { Container, Input } from 'reactstrap';
 import './App.scss';
 import camera from './camera.svg';
 import { GBNavbar } from './GBNavbar';
+import { InterestingProducts } from './InterestingProducts';
 
 class App extends Component {
   private photoInput = React.createRef<HTMLInputElement>();
@@ -42,6 +43,7 @@ class App extends Component {
               <img src={camera} />
             </div>
           </div>
+          <InterestingProducts />
         </Container>
       </div>
     );
