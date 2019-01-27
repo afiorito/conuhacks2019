@@ -4,32 +4,15 @@ import { Button, Card, CardBody, CardColumns, CardImg, CardSubtitle, CardText, C
 import { IProduct } from '../../server/db/models/Product';
 import './InterestingProducts.scss';
 
-interface IInterestingProductsState {
-  products: IProduct[];
-  isLoading: boolean;
+interface IRelevantProductsProps {
+    category: string | null;
+    products: IProduct[] | null;
+    isLoading: boolean;
 }
 
-export class InterestingProducts extends React.Component<{}, IInterestingProductsState>  {
-  constructor(props: object) {
+export class RelevantProducts extends React.Component<IRelevantProductsProps>  {
+  constructor(props: IRelevantProductsProps) {
     super(props);
-
-    this.state = {
-      isLoading: false,
-      products: [],
-    };
-  }
-
-  public async componentDidMount () {
-      this.setState({ isLoading: true });
-
-      try {
-        const response = await fetch('/api/products/interesting');
-        const data = await response.json();
-
-        this.setState({ products: data, isLoading: false });
-      } catch {
-        this.setState({ products: [], isLoading: false });
-      }
   }
 
   public formatSubstring(text: string, max: number) {
@@ -47,7 +30,7 @@ export class InterestingProducts extends React.Component<{}, IInterestingProduct
   }
 
   public renderProducts() {
-      return this.state.products.map(p => {
+      return this.props.products!.map(p => {
           return (
               <Card key={p.productId}>
                   <CardImg top width="50%"  src={p.image} alt="Card image cap" />
@@ -66,13 +49,13 @@ export class InterestingProducts extends React.Component<{}, IInterestingProduct
     return (
       <div className="InterestingProducts">
         <Container>
-            {this.state.isLoading && <ReactLoading className="spinner" type="spin" color="#6f9940" height={100} width={100} />}
-            {!this.state.isLoading && this.state.products.length > 0 ? <React.Fragment>
-              <h4>Some sustainable products that might interest you.</h4>
+            {this.props.isLoading && <ReactLoading className="spinner" type="spin" color="#6f9940" height={100} width={100} />} 
+            {!this.props.isLoading && this.props.products!.length > 0 ? <React.Fragment>
+              <h4>Sustainable {this.props.category}</h4>
               <CardColumns xs="12" md="6">
                   {this.renderProducts()}
               </CardColumns>
-            </React.Fragment> : !this.state.isLoading && <div className="not-found">No results found</div>}
+            </React.Fragment> : !this.props.isLoading && <div className="not-found">No products found.</div>}
         </Container>
       </div>
     );

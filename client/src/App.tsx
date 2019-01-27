@@ -1,12 +1,30 @@
 import React, { Component } from 'react';
 import { Container, Input } from 'reactstrap';
+import { IProduct } from '../../server/db/models/Product';
 import './App.scss';
 import camera from './camera.svg';
 import { GBNavbar } from './GBNavbar';
 import { InterestingProducts } from './InterestingProducts';
+import { RelevantProducts } from './RelevantProducts';
 
-class App extends Component {
+interface IAppState {
+  category: string | null;
+  products: IProduct[] | null;
+  isLoading: boolean;
+}
+
+class App extends Component<{}, IAppState> {
   private photoInput = React.createRef<HTMLInputElement>();
+
+  constructor(props: object) {
+    super(props);
+
+    this.state = {
+      isLoading: false,
+      products: null,
+      category: null,
+    }
+  }
 
   public accessCamera = () => {
     if (this.photoInput.current) {
@@ -14,7 +32,7 @@ class App extends Component {
     }
   }
 
-  public handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  public handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) {
       return;
     }
@@ -24,14 +42,23 @@ class App extends Component {
     const formData = new FormData();
     formData.append('file', file);
 
-    fetch('/api/products/search/image', {
-      body: formData,
-      method: 'POST',
-    });
+    this.setState({ isLoading: true });
+    try {
+      const response = await fetch('/api/products/search/image', {
+        body: formData,
+        method: 'POST',
+      });
+      const data = await response.json();
+
+      this.setState({ category: data.category, products: data.products, isLoading: false });
+    } catch {
+      this.setState({ products: [], isLoading: false });
+    }
 
   }
 
   public render() {
+    const { isLoading, products, category } = this.state;
     return (
       <div className="App">
         <GBNavbar/>
@@ -43,7 +70,7 @@ class App extends Component {
               <img src={camera} />
             </div>
           </div>
-          <InterestingProducts />
+          {!isLoading && products == null ? <InterestingProducts /> : <RelevantProducts isLoading={isLoading} products={products} category={category} />}
         </Container>
       </div>
     );

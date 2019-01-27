@@ -28,6 +28,9 @@ app.get('/', async (req, res) => {
 app.use('/api/products', products);
 app.use('/api/categories', categories);
 
+process.env.GOOGLE_APPLICATION_CREDENTIALS='/Users/Anthony/Programming/green-beans/Keys/greenbeans-e18a1a92026f.json';
+
 app.listen(port, () => {
     console.log(`Server listening on port ${port}`);
+    console.log(process.env.GOOGLE_APPLICATION_CREDENTIALS);
 });

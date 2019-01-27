@@ -7,38 +7,38 @@ export const products = express.Router();
 const upload = multer();
 
 products.get('/', async (req, res) => {
-    res.json(await Product.find({ category: {$in: ['Utensils']} }));
+    res.json(await Product.find({}));
 });
 
 products.get('/interesting', async (req, res) => {
     res.json(await Product.aggregate([{ $sample: { size: 10 } }]));
 });
 
-products.post('/search/image', upload.array('file'), (req, res) => {
+products.post('/search/image', upload.array('file'), async (req, res) => {
     const file = Object.values(req.files)[0];
-    console.log(file.buffer);
-    quickstart(file.buffer);
-    //console.log(file);
+    const keywords = await generateKeywords(file.buffer);
+
+    let category = null;
+    const products = await Product.find({ attributes: {$in: keywords.map((k: string) => k.toLowerCase())} });
+
+    if (products.length > 0 ) {
+        category = (products[0] as any).category;
+    }
+
+    res.json({ category, products });
 });
 
-async function quickstart(temp:any) {
-    // Imports the Google Cloud client library
+async function generateKeywords(buffer: Buffer) {
     const vision = require('@google-cloud/vision');
-  
+
     // Convert the image data to a Buffer and base64 encode it.
-    var encoded = Buffer.from(temp).toString('base64');
+    const encoded = Buffer.from(buffer).toString('base64');
 
     // Creates a client
     const client = new vision.ImageAnnotatorClient();
 
-    const [result] = await client.labelDetection({image: { content: encoded}});
+    const [result] = await client.labelDetection({image: { content: encoded }});
     const labels = result.labelAnnotations;
 
-    var words=[]; 
-  
-    // labels.forEach((label:any) => console.log(label.description));
-    var i;
-    for (i = 0; i < labels.length; i++)
-        words[i] = labels[i].description;
-    console.log(words);
+    return labels.map((l: any) => l.description);
 }

@@ -20,4 +20,5 @@ yarn-debug.log*
 yarn-error.log*
 
 #key
-greenbeans-60c91f90c5ba.json
+greenbeans-*.json
+key.ts
