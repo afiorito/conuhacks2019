@@ -1,0 +1,32 @@
+.InterestingProducts {
+    .card {
+        margin: 20px 5px;
+        padding: 8px;
+    }
+
+    h4 {
+        margin-top: 20px;
+    }
+
+    .spinner {
+        margin: 0 auto;
+        margin-top: 100px;
+    }
+
+    @media (min-width: 576px) and (max-width: 1000px)
+    {
+        .card-columns {
+            -webkit-column-count: 2;
+            -moz-column-count: 2;
+            column-count: 2;
+        }
+
+        .card-title {
+            font-weight: bold;
+        }
+
+        .card-subtitle {
+            font-weight: 300;
+        }
+    }
+}
