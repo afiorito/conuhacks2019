@@ -1,10 +1,12 @@
 import React from 'react';
-import { Button, Card, CardBody, CardImg, CardSubtitle, CardText, CardTitle } from 'reactstrap';
+import ReactLoading from 'react-loading';
+import { Button, Card, CardBody, CardColumns, CardImg, CardSubtitle, CardText, CardTitle, Col, Container, Row } from 'reactstrap';
 import { IProduct } from '../../server/db/models/Product';
 import './InterestingProducts.scss';
 
 interface IInterestingProductsState {
   products: IProduct[];
+  isLoading: boolean;
 }
 
 export class InterestingProducts extends React.Component<{}, IInterestingProductsState>  {
@@ -12,29 +14,45 @@ export class InterestingProducts extends React.Component<{}, IInterestingProduct
     super(props);
 
     this.state = {
-      products: []
+      isLoading: false,
+      products: [],
     };
   }
 
   public async componentDidMount () {
+      this.setState({ isLoading: true });
       const response = await fetch('/api/products/interesting');
       const data = await response.json();
 
-      this.setState({ products: data });
+      this.setState({ products: data, isLoading: false });
+  }
+
+  public formatSubstring(text: string, max: number) {
+    let result = text.substr(0, max);
+
+    if (text.length > max) {
+      result += '...';
+    }
+
+    return result;
+  }
+
+  public viewProduct = (url: string)  => {
+    window.open(url);
   }
 
   public renderProducts() {
       return this.state.products.map(p => {
           return (
-            <Card>
-                <CardImg top width="100%" src={p.image} alt="Card image cap" />
-                <CardBody>
-                <CardTitle>{p.name}</CardTitle>
-                <CardSubtitle>Card subtitle</CardSubtitle>
-                <CardText>Some quick example text to build on the card title and make up the bulk of the card's content.</CardText>
-                <Button>Button</Button>
-                </CardBody>
-            </Card>
+              <Card key={p.productId}>
+                  <CardImg top width="50%"  src={p.image} alt="Card image cap" />
+                  <CardBody>
+                  <CardTitle>{this.formatSubstring(p.name, 80)}</CardTitle>
+                  <CardSubtitle>{`$${p.price}`}</CardSubtitle>
+                  <CardText>{this.formatSubstring(p.shortDescription, 120)}</CardText>
+                  <Button onClick={this.viewProduct.bind(undefined, p.url) as any} >View Product</Button>
+                  </CardBody>
+              </Card>
           );
       });
   }
@@ -42,7 +60,15 @@ export class InterestingProducts extends React.Component<{}, IInterestingProduct
   public render() {
     return (
       <div className="InterestingProducts">
-        {this.renderProducts()}
+        <Container>
+            {this.state.isLoading ? <ReactLoading className="spinner" type="spin" color="#6f9940" height={100} width={100} /> : 
+            <React.Fragment>
+              <h4>Some sustainable products that might interest you.</h4>
+              <CardColumns xs="12" md="6">
+                  {this.renderProducts()}
+              </CardColumns>
+            </React.Fragment>}
+        </Container>
       </div>
     );
   }
