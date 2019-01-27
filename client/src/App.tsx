@@ -3,6 +3,12 @@ import './App.scss';
 import logo from './logo.svg';
 
 class App extends Component {
+  public async componentDidMount() {
+    const message = await fetch('/');
+
+    console.log(message);
+
+  }
   public render() {
     return (
       <div className="App">
