@@ -13,6 +13,23 @@ class App extends Component {
     }
   }
 
+  public handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) {
+      return;
+    }
+
+    const file = Array.from(e.target.files)[0];
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    fetch('/api/products/search/image', {
+      body: formData,
+      method: 'POST',
+    });
+
+  }
+
   public render() {
     return (
       <div className="App">
@@ -21,7 +38,7 @@ class App extends Component {
           <div className="input-container">
             <Input placeholder="Search for a sustainable alternative..." />
             <div onClick={this.accessCamera} className="camera-input">
-              <input ref={this.photoInput} type="file" accept="image/*" capture="camera" />
+              <input onChange={this.handleImageUpload} ref={this.photoInput} type="file" accept="image/*" capture="camera" />
               <img src={camera} />
             </div>
           </div>
