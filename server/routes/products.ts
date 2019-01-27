@@ -2,7 +2,7 @@ import express from 'express';
 import multer from 'multer';
 import { Product } from '../db/models/Product';
 
-const products = express.Router();
+export const products = express.Router();
 
 const upload = multer();
 
@@ -17,5 +17,3 @@ products.get('/interesting', async (req, res) => {
 products.post('/search/image', upload.array('file'), (req, res) => {
     console.log(req);
 });
-
-export { products };
