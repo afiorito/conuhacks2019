@@ -7,6 +7,7 @@ var port:number = 80;
 app.use(bodyParser.json());
 
 app.get('/', (req, res) => {
+    console.log(`Request Recieved`);
     res.send('Hello World!');
 });
 
